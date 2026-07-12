@@ -1,0 +1,46 @@
+{
+  "build": "h1c6eee0_0",
+  "build_number": 0,
+  "channel": "https://repo.anaconda.com/pkgs/main/win-64",
+  "constrains": [],
+  "depends": [
+    "ucrt >=10.0.20348.0",
+    "vc >=14.3,<15",
+    "vc14_runtime >=14.44.35208"
+  ],
+  "extracted_package_dir": "C:\\Users\\User\\anaconda3\\pkgs\\libmpdec-4.0.1-h1c6eee0_0",
+  "files": [
+    "Library/bin/libmpdec-4.dll",
+    ".nonadmin"
+  ],
+  "fn": "libmpdec-4.0.1-h1c6eee0_0.conda",
+  "legacy_bz2_md5": "f661a50a657c4c511de76c9ce5706ab0",
+  "license": "BSD-2-Clause",
+  "license_family": "BSD",
+  "link": {
+    "source": "C:\\Users\\User\\anaconda3\\pkgs\\libmpdec-4.0.1-h1c6eee0_0",
+    "type": 1
+  },
+  "md5": "2b3719f254286608767ca0dfb37ba00e",
+  "name": "libmpdec",
+  "package_tarball_full_path": "C:\\Users\\User\\anaconda3\\pkgs\\libmpdec-4.0.1-h1c6eee0_0.conda",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "Library/bin/libmpdec-4.dll",
+        "path_type": "hardlink",
+        "sha256": "4e12f3fdd426e11b6d4ec32c74455f68f5898f9d9377f135a022ed2c4aa74dfd",
+        "sha256_in_prefix": "4e12f3fdd426e11b6d4ec32c74455f68f5898f9d9377f135a022ed2c4aa74dfd",
+        "size_in_bytes": 212808
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "4e89181b2d9ec67a855517ff35c6901d649829a31ac9c366c5277bd56563fe50",
+  "size": 95439,
+  "subdir": "win-64",
+  "timestamp": 1781726059827,
+  "url": "https://repo.anaconda.com/pkgs/main/win-64/libmpdec-4.0.1-h1c6eee0_0.conda",
+  "version": "4.0.1"
+}
