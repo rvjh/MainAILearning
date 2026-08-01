@@ -1,4 +1,4 @@
-## Run in the below manner 
+# Run in the below manner 
 
 First RUn the server : python fast_mcp.py 
 
@@ -6,7 +6,7 @@ then run others with python
 
 Note : for fast_mcp.py it may throw error. so use sys. or the path (D:\Mainfold_AI_Bootcamp\Orientation\MainAILearning\Session5\fast_mcp.py) - see code 
 
-#### Output :
+# Output :
 
 MCP Tools Loaded:
 - add
