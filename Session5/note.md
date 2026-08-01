@@ -26,7 +26,6 @@ DEBUG TOOL CALLS:
 []
 
 Assistant: The result of 100 * 3 is 300.
-------------------------------------------------------------
 You: add it with 100
 
 DEBUG TOOL CALLS:
@@ -36,5 +35,4 @@ DEBUG TOOL CALLS:
 []
 
 Assistant: The result of 300 + 100 is 400.
-------------------------------------------------------------
 You: exit
