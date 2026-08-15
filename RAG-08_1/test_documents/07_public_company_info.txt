@@ -1,0 +1,24 @@
+PUBLIC - Company Information
+
+About QuantumFlux Industries
+
+QuantumFlux Industries is a leading provider of enterprise software solutions, founded in 2018. We serve over 500 enterprise clients worldwide.
+
+Our Mission:
+To empower businesses with cutting-edge software solutions that drive innovation and growth.
+
+Our Products:
+- Enterprise Resource Planning (ERP) systems
+- Customer Relationship Management (CRM) platforms
+- Business Intelligence and Analytics tools
+
+Contact Information:
+- Website: www.quantumflux.com
+- Email: info@quantumflux.com
+- Phone: 1-800-QUANTUM
+
+Careers:
+We're always looking for talented individuals to join our team. Visit our careers page for open positions.
+
+Access Level: PUBLIC
+Last Updated: January 2024

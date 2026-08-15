@@ -1,0 +1,117 @@
+{
+  "01_financial_report.txt": {
+    "source_file": "01_financial_report.txt",
+    "department": "finance",
+    "access_level": "confidential",
+    "doc_type": "report",
+    "year": 2024,
+    "quarter": "Q4",
+    "tenant_id": "company-abc",
+    "created_by": "finance_team@company.com",
+    "tags": ["financial", "revenue", "quarterly"]
+  },
+  "02_legal_contract.txt": {
+    "source_file": "02_legal_contract.txt",
+    "department": "legal",
+    "access_level": "confidential",
+    "doc_type": "contract",
+    "tenant_id": "company-abc",
+    "created_by": "legal_team@company.com",
+    "tags": ["legal", "contract", "liability"]
+  },
+  "03_aws_ec2_pricing.txt": {
+    "source_file": "03_aws_ec2_pricing.txt",
+    "department": "engineering",
+    "access_level": "internal",
+    "doc_type": "technical",
+    "year": 2024,
+    "month": "November",
+    "tenant_id": "company-abc",
+    "created_by": "engineering_team@company.com",
+    "tags": ["aws", "ec2", "pricing", "cloud"]
+  },
+  "04_cloud_computing_guide.txt": {
+    "source_file": "04_cloud_computing_guide.txt",
+    "department": "engineering",
+    "access_level": "internal",
+    "doc_type": "guide",
+    "tenant_id": "company-abc",
+    "created_by": "engineering_team@company.com",
+    "tags": ["cloud", "optimization", "cost"]
+  },
+  "05_hr_salary_data.txt": {
+    "source_file": "05_hr_salary_data.txt",
+    "department": "hr",
+    "access_level": "confidential",
+    "doc_type": "salary",
+    "year": 2024,
+    "tenant_id": "company-abc",
+    "created_by": "hr_team@company.com",
+    "tags": ["hr", "salary", "compensation", "sensitive"]
+  },
+  "06_engineering_budget.txt": {
+    "source_file": "06_engineering_budget.txt",
+    "department": "engineering",
+    "access_level": "internal",
+    "doc_type": "budget",
+    "year": 2024,
+    "quarter": "Q4",
+    "tenant_id": "company-abc",
+    "created_by": "engineering_team@company.com",
+    "tags": ["engineering", "budget", "financial"]
+  },
+  "07_public_company_info.txt": {
+    "source_file": "07_public_company_info.txt",
+    "department": "marketing",
+    "access_level": "public",
+    "doc_type": "public_info",
+    "tenant_id": "company-abc",
+    "created_by": "marketing_team@company.com",
+    "tags": ["public", "company", "information"]
+  },
+  "08_semantic_similarity_test.txt": {
+    "source_file": "08_semantic_similarity_test.txt",
+    "department": "test",
+    "access_level": "internal",
+    "doc_type": "test",
+    "tenant_id": "company-abc",
+    "created_by": "test_team@company.com",
+    "tags": ["test", "semantic", "similarity"]
+  },
+  "09_multi_column_document.txt": {
+    "source_file": "09_multi_column_document.txt",
+    "department": "research",
+    "access_level": "internal",
+    "doc_type": "research",
+    "tenant_id": "company-abc",
+    "created_by": "research_team@company.com",
+    "tags": ["research", "ml", "academic"]
+  },
+  "10_code_example.py": {
+    "source_file": "10_code_example.py",
+    "department": "engineering",
+    "access_level": "internal",
+    "doc_type": "code",
+    "tenant_id": "company-abc",
+    "created_by": "engineering_team@company.com",
+    "tags": ["code", "python", "example"]
+  },
+  "11_company_policy.docx": {
+    "source_file": "11_company_policy.docx",
+    "department": "hr",
+    "access_level": "internal",
+    "doc_type": "policy",
+    "tenant_id": "company-abc",
+    "created_by": "hr_team@company.com",
+    "tags": ["policy", "remote", "work"]
+  },
+  "12_blog_post.html": {
+    "source_file": "12_blog_post.html",
+    "department": "marketing",
+    "access_level": "public",
+    "doc_type": "blog",
+    "tenant_id": "company-abc",
+    "created_by": "marketing_team@company.com",
+    "tags": ["blog", "rag", "engineering"]
+  }
+}

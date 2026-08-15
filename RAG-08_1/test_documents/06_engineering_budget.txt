@@ -1,0 +1,34 @@
+Engineering Department Budget - Q4 2024
+
+Department: Engineering
+Access Level: INTERNAL
+Budget Period: October - December 2024
+
+Budget Allocation:
+
+Personnel Costs:
+- Salaries: $1.2M
+- Benefits: $300K
+- Bonuses: $150K
+
+Infrastructure:
+- Cloud Services (AWS): $80K
+- Development Tools: $25K
+- Hardware: $45K
+
+Projects:
+- Product Development: $200K
+- Infrastructure Improvements: $120K
+- Security Enhancements: $75K
+
+Total Q4 Budget: $2.195M
+
+Key Initiatives:
+1. Migration to microservices architecture
+2. Implementation of CI/CD pipeline
+3. Security audit and remediation
+
+Notes:
+- AWS costs increased 15% due to scaling requirements
+- Development tools budget includes new licenses for team expansion
+- Security project approved for Q1 2025 continuation

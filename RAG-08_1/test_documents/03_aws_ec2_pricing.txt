@@ -1,0 +1,30 @@
+AWS EC2 Pricing Update - November 2024
+
+Effective November 1, 2024, AWS has updated pricing for EC2 instances across all regions.
+
+Key Changes:
+- On-Demand instances: 5% price reduction
+- Reserved Instances: 10% price reduction for 3-year terms
+- Spot Instances: Pricing remains variable based on demand
+
+New Instance Types:
+- EC2 m7i.2xlarge: $0.384 per hour (on-demand)
+- EC2 c7i.4xlarge: $0.68 per hour (on-demand)
+
+Regional Pricing:
+- US East (N. Virginia): Base pricing
+- US West (Oregon): +2% premium
+- EU (Ireland): +5% premium
+
+For questions about EC2 pricing changes, contact your AWS account manager.
+
+Machine learning is a subset of artificial intelligence (AI) that enables systems to learn from data, identify patterns, and make decisions or predictions without being explicitly programmed. By utilizing statistical algorithms, these models improve their accuracy through experience, allowing them to automate complex tasks and analyze vast datasets. 
+Core Concepts and Functionality Learning Process: Machine learning involves feeding data into algorithms to create a model. The system analyzes this training data to uncover underlying patterns.
+Without Explicit Programming: Unlike traditional software, where every rule is programmed by a human, machine learning models infer rules from the data itself.
+Predictions and Generalization: A key goal is to apply learned patterns to new, unseen data, allowing the system to make predictions, classify information, or generate content.
+Types of Machine Learning:
+Supervised Learning: Trains models using labeled data to classify or predict data points.
+Unsupervised Learning: Analyzes unlabeled data to find hidden structures or patterns, such as clustering.
+Reinforcement Learning: Involves training agents through trial and error to make decisions based on rewards. 
+Applications
+Machine learning is heavily used in daily technology, including: 

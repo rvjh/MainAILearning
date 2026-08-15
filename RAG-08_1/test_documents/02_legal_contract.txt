@@ -1,0 +1,17 @@
+CONFIDENTIAL - LEGAL CONTRACT
+
+Section 7.3 - Liability and Damages
+
+The parties agree that in the event of a breach of Section 7.3, the liable party shall pay damages not exceeding $500,000. This limitation does not apply to breaches involving gross negligence or willful misconduct as defined in Section 2.4.
+
+Notwithstanding the foregoing, neither party shall be liable for indirect, incidental, special, or consequential damages arising from the performance or non-performance of this agreement.
+
+Section 2.4 - Definitions
+
+For the purposes of this agreement:
+- "Gross negligence" means a conscious and voluntary disregard of the need to use reasonable care.
+- "Willful misconduct" means intentional conduct that is in reckless disregard of the consequences.
+
+Section 8.1 - Termination
+
+Either party may terminate this agreement with 30 days written notice. Upon termination, all outstanding obligations must be fulfilled within 60 days.

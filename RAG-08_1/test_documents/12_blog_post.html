@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>RAG Best Practices - Engineering Blog</title></head>
+<body>
+<article>
+<h1>RAG Best Practices for Production</h1>
+<p>Retrieval-Augmented Generation (RAG) systems require careful design. This post covers document processing, chunking, and retrieval.</p>
+<h2>Document Processing</h2>
+<p>Use the right extractor: pdfplumber for tables, OCR for scanned docs. Validate extraction quality before chunking.</p>
+<h2>Chunking Strategy</h2>
+<p>Prefer semantic chunking over character-based. Preserve sentence and paragraph boundaries. Add 10-20% overlap.</p>
+<h2>Summary</h2>
+<p>Layer 1 (extraction) and Layer 2 (chunking) determine retrieval quality. Get these right before optimizing embeddings.</p>
+</article>
+</body>
+</html>

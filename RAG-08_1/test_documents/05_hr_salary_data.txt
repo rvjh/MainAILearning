@@ -1,0 +1,31 @@
+CONFIDENTIAL - HR DEPARTMENT ONLY
+
+2024 Salary Review Data
+
+Department: Human Resources
+Access Level: CONFIDENTIAL
+Classification: Internal Use Only
+
+Salary Ranges by Department:
+
+Engineering:
+- Junior Engineer: $80,000 - $100,000
+- Senior Engineer: $120,000 - $150,000
+- Engineering Manager: $150,000 - $180,000
+
+Finance:
+- Financial Analyst: $70,000 - $90,000
+- Senior Financial Analyst: $90,000 - $120,000
+- Finance Director: $140,000 - $170,000
+
+Sales:
+- Sales Representative: $60,000 base + commission
+- Sales Manager: $90,000 base + commission
+- Sales Director: $130,000 base + commission
+
+Q4 2024 Salary Adjustments:
+- Average increase: 4.5%
+- Performance-based bonuses: $2.1M total
+- Equity grants: 50,000 shares distributed
+
+This document contains sensitive compensation information and should only be accessed by authorized HR personnel.
