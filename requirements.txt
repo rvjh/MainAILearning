@@ -99,3 +99,5 @@ arxiv
 mcp
 langchain-mcp-adapters
 fastmcp
+langchain-huggingface 
+huggingface_hub
