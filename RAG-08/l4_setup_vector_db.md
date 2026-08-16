@@ -158,3 +158,4 @@ LIMIT 5;
 SELECT vector_dims(embedding)
 FROM documents
 LIMIT 5;
+```
