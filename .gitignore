@@ -153,6 +153,7 @@ activemq-data/
 .venv
 env/
 myenv/
+myenv1/
 venv/
 ENV/
 env.bak/
