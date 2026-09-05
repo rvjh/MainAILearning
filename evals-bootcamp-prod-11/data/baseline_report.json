@@ -1,0 +1,2 @@
+{"prompt_version":"v1","summary":{"mean_recall":0.72,"mean_mrr":0.68,"deterministic_pass_rate":0.83,"trajectory_pass_rate":1.0,"mean_judge":0.71,"overall_pass_rate":0.67}}
+
