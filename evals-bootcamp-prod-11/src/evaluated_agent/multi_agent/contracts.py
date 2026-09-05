@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from ..contracts import JudgeVerdict
 
@@ -12,17 +12,37 @@ RouteTarget = Literal["policy_specialist", "tool_specialist", "escalation_specia
 
 
 class RouteDecision(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     next_agent: RouteTarget = Field(description="Specialist to invoke for this ticket")
     reason: str = Field(description="Short routing rationale")
 
 
+class ToolArguments(BaseModel):
+    """Fixed-key tool args for OpenAI structured output (no free-form dicts)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    order_id: str = ""
+    email: str = ""
+    priority: str = ""
+    summary: str = ""
+
+    def as_dict(self) -> dict[str, Any]:
+        return {k: v for k, v in self.model_dump().items() if v}
+
+
 class ToolCallPlan(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     tool_name: Literal["lookup_order", "create_ticket", "get_account_status", "none"]
-    arguments: dict[str, Any] = Field(default_factory=dict)
+    arguments: ToolArguments = Field(default_factory=ToolArguments)
     rationale: str = ""
 
 
 class SpecialistAnswer(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     answer: str
     abstained: bool = False
     citations: list[str] = Field(default_factory=list)

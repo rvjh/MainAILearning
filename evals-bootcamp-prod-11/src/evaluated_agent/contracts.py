@@ -2,16 +2,20 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class GroundedAnswer(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     answer: str = Field(description="Answer using only the supplied context")
     citations: list[str] = Field(description="Document IDs that directly support the answer")
     abstained: bool = Field(description="True when the context is insufficient")
 
 
 class JudgeVerdict(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     correctness: int = Field(ge=1, le=4)
     groundedness: int = Field(ge=1, le=4)
     relevance: int = Field(ge=1, le=4)

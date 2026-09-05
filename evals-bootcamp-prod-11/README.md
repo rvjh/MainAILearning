@@ -62,3 +62,11 @@ For GitHub Actions API jobs, add repository secrets:
 
 - `OPENAI_API_KEY`
 - `LANGSMITH_API_KEY`
+
+```
+git init
+git add .
+git commit -m "Evals Test"
+git remote add origin ""
+git push -u origin main
+```
