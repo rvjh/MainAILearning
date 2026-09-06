@@ -1,0 +1,4 @@
+=== Phase 2/2: API scale-out (ALB requests + CPU via sustained load) ===
+Sustained load: 180s, 80 workers, URL=http://aws-agent-deployment-demo-alb-1720809015.us-east-1.elb.amazonaws.com
+WARN: API did not scale within 240s; checking after load completes...
+FAIL: API desired count still 4 (need >= 5)

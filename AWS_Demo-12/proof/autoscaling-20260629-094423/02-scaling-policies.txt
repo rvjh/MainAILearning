@@ -1,0 +1,4 @@
+## Application Auto Scaling policies
+-------------------------
+|DescribeScalingPolicies|
++-----------------------+

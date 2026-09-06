@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AWS Agent Deployment Demo</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #1e293b;
+      --accent: #38bdf8;
+      --muted: #94a3b8;
+      --ok: #4ade80;
+      --warn: #fbbf24;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+    header {
+      padding: 16px 24px;
+      background: #020617;
+      border-bottom: 1px solid #1e293b;
+    }
+    header h1 { margin: 0; font-size: 18px; }
+    header p { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+    main {
+      max-width: 760px;
+      margin: 24px auto;
+      padding: 0 16px 40px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+    label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+    textarea {
+      width: 100%;
+      min-height: 96px;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #475569;
+      background: #0b1220;
+      color: #e2e8f0;
+      font-size: 14px;
+      resize: vertical;
+    }
+    button {
+      margin-top: 12px;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #04293a;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    button:disabled { opacity: 0.5; cursor: default; }
+    .status {
+      display: inline-block;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #0b1220;
+      border: 1px solid #334155;
+      color: var(--muted);
+    }
+    .status.running { color: var(--warn); border-color: #854d0e; }
+    .status.completed { color: var(--ok); border-color: #166534; }
+    .status.failed { color: #f87171; border-color: #991b1b; }
+    pre {
+      background: #0b1220;
+      border-radius: 8px;
+      padding: 12px;
+      overflow: auto;
+      font-size: 12px;
+      line-height: 1.5;
+      margin: 12px 0 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .answer {
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 8px;
+      background: #0b1220;
+      border: 1px solid #334155;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+    .links { margin-top: 10px; font-size: 12px; }
+    .links a { color: var(--accent); margin-right: 14px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>AWS Agent Deployment Demo</h1>
+    <p>FastAPI + Celery + Redis on ECS Fargate — submit a query, worker runs via Tool Gateway + OpenAI</p>
+  </header>
+
+  <main>
+    <div class="card">
+      <label for="query">Ask about the deployment architecture</label>
+      <textarea id="query">What is the deployment architecture?</textarea>
+      <button id="submit">Run agent job</button>
+      <div class="links">
+        <a href="/docs" target="_blank" rel="noopener">API docs</a>
+        <a href="/health" target="_blank" rel="noopener">Health check</a>
+      </div>
+    </div>
+
+    <div class="card" id="result-card" hidden>
+      <div>
+        <strong>Job</strong>
+        <span id="job-id" style="color: var(--muted); font-size: 12px; margin-left: 8px;"></span>
+        <span id="status" class="status" style="margin-left: 8px;">queued</span>
+      </div>
+      <div id="progress" style="margin-top: 10px; color: var(--muted); font-size: 13px;"></div>
+      <div id="answer" class="answer" hidden></div>
+      <pre id="raw" hidden></pre>
+    </div>
+  </main>
+
+  <script>
+    const queryEl = document.getElementById("query");
+    const submitBtn = document.getElementById("submit");
+    const resultCard = document.getElementById("result-card");
+    const jobIdEl = document.getElementById("job-id");
+    const statusEl = document.getElementById("status");
+    const progressEl = document.getElementById("progress");
+    const answerEl = document.getElementById("answer");
+    const rawEl = document.getElementById("raw");
+
+    function setStatus(status) {
+      statusEl.textContent = status;
+      statusEl.className = "status " + status;
+    }
+
+    async function pollJob(jobId) {
+      for (let i = 0; i < 60; i++) {
+        const res = await fetch("/jobs/" + jobId);
+        const data = await res.json();
+        setStatus(data.status);
+
+        if (data.progress) {
+          progressEl.textContent = "Step: " + data.progress.step + " (" + data.progress.progress + "%)";
+        } else {
+          progressEl.textContent = "";
+        }
+
+        if (data.status === "completed") {
+          answerEl.hidden = false;
+          answerEl.textContent = data.result?.answer || JSON.stringify(data.result, null, 2);
+          rawEl.hidden = false;
+          rawEl.textContent = JSON.stringify(data, null, 2);
+          submitBtn.disabled = false;
+          return;
+        }
+
+        if (data.status === "failed") {
+          rawEl.hidden = false;
+          rawEl.textContent = JSON.stringify(data, null, 2);
+          submitBtn.disabled = false;
+          return;
+        }
+
+        await new Promise((r) => setTimeout(r, 1000));
+      }
+      progressEl.textContent = "Timed out waiting for job.";
+      submitBtn.disabled = false;
+    }
+
+    submitBtn.addEventListener("click", async () => {
+      const query = queryEl.value.trim();
+      if (!query) return;
+
+      submitBtn.disabled = true;
+      resultCard.hidden = false;
+      answerEl.hidden = true;
+      rawEl.hidden = true;
+      answerEl.textContent = "";
+      progressEl.textContent = "Submitting…";
+      setStatus("queued");
+
+      try {
+        const res = await fetch("/jobs", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || "Submit failed");
+
+        jobIdEl.textContent = data.job_id;
+        await pollJob(data.job_id);
+      } catch (err) {
+        setStatus("failed");
+        progressEl.textContent = String(err);
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

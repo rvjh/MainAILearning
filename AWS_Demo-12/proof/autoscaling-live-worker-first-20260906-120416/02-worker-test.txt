@@ -1,0 +1,4 @@
+=== Phase 1/2: Worker scale-out (QueueDepth custom metric) ===
+Publishing QueueDepth=25 to aws-agent-deployment-demo/Celery (target scale-out threshold is typically 5)...
+PASS: Worker desired count increased to >= 2
+Worker tasks stable at scaled count.

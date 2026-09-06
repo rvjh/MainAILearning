@@ -1,0 +1,55 @@
+{
+  "family": "aws-agent-deployment-demo-worker",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "EXECUTION_ROLE_ARN",
+  "taskRoleArn": "TASK_ROLE_ARN",
+  "containerDefinitions": [
+    {
+      "name": "CONTAINER_NAME",
+      "image": "AWS_ACCOUNT_ID.dkr.ecr.AWS_REGION.amazonaws.com/ECR_REPOSITORY:IMAGE_TAG",
+      "essential": true,
+      "command": [
+        "celery",
+        "-A",
+        "app.celery_app.celery_app",
+        "worker",
+        "--loglevel=info"
+      ],
+      "environment": [
+        {
+          "name": "APP_ENV",
+          "value": "production"
+        },
+        {
+          "name": "SERVICE_NAME",
+          "value": "aws-agent-deployment-demo-worker"
+        },
+        {
+          "name": "OPENAI_MODEL",
+          "value": "gpt-4o-mini"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "REDIS_URL",
+          "valueFrom": "REDIS_URL_SECRET_ARN"
+        },
+        {
+          "name": "OPENAI_API_KEY",
+          "valueFrom": "OPENAI_API_KEY_SECRET_ARN"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "LOG_GROUP",
+          "awslogs-region": "AWS_REGION",
+          "awslogs-stream-prefix": "worker"
+        }
+      }
+    }
+  ]
+}

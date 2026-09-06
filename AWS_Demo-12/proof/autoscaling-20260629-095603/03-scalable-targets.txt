@@ -1,0 +1,38 @@
+## Scalable targets
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|                                                                        DescribeScalableTargets                                                                        |
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+||                                                                           ScalableTargets                                                                           ||
+|+-------------------+-------------------------------------------------------------------------------------------------------------------------------------------------+|
+||  CreationTime     |  2026-06-29T09:50:45.787000+05:30                                                                                                               ||
+||  MaxCapacity      |  4                                                                                                                                              ||
+||  MinCapacity      |  1                                                                                                                                              ||
+||  ResourceId       |  service/aws-agent-deployment-demo-cluster/aws-agent-deployment-demo-worker                                                                     ||
+||  RoleARN          |  arn:aws:iam::074388197187:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService   ||
+||  ScalableDimension|  ecs:service:DesiredCount                                                                                                                       ||
+||  ScalableTargetARN|  arn:aws:application-autoscaling:us-east-1:074388197187:scalable-target/0ec545ad403e5d1f48b2bc7b18bb42c2ca94                                    ||
+||  ServiceNamespace |  ecs                                                                                                                                            ||
+|+-------------------+-------------------------------------------------------------------------------------------------------------------------------------------------+|
+|||                                                                          SuspendedState                                                                           |||
+||+-----------------------------------------------------------------------------------------------------------------------------+-------------------------------------+||
+|||  DynamicScalingInSuspended                                                                                                  |  False                              |||
+|||  DynamicScalingOutSuspended                                                                                                 |  False                              |||
+|||  ScheduledScalingSuspended                                                                                                  |  False                              |||
+||+-----------------------------------------------------------------------------------------------------------------------------+-------------------------------------+||
+||                                                                           ScalableTargets                                                                           ||
+|+-------------------+-------------------------------------------------------------------------------------------------------------------------------------------------+|
+||  CreationTime     |  2026-06-29T09:50:45.827000+05:30                                                                                                               ||
+||  MaxCapacity      |  4                                                                                                                                              ||
+||  MinCapacity      |  1                                                                                                                                              ||
+||  ResourceId       |  service/aws-agent-deployment-demo-cluster/aws-agent-deployment-demo-api                                                                        ||
+||  RoleARN          |  arn:aws:iam::074388197187:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService   ||
+||  ScalableDimension|  ecs:service:DesiredCount                                                                                                                       ||
+||  ScalableTargetARN|  arn:aws:application-autoscaling:us-east-1:074388197187:scalable-target/0ec55964e77e2fef4b889adc36d6f353f455                                    ||
+||  ServiceNamespace |  ecs                                                                                                                                            ||
+|+-------------------+-------------------------------------------------------------------------------------------------------------------------------------------------+|
+|||                                                                          SuspendedState                                                                           |||
+||+-----------------------------------------------------------------------------------------------------------------------------+-------------------------------------+||
+|||  DynamicScalingInSuspended                                                                                                  |  False                              |||
+|||  DynamicScalingOutSuspended                                                                                                 |  False                              |||
+|||  ScheduledScalingSuspended                                                                                                  |  False                              |||
+||+-----------------------------------------------------------------------------------------------------------------------------+-------------------------------------+||

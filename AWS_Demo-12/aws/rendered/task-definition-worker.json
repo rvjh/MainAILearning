@@ -1,0 +1,55 @@
+{
+  "family": "aws-agent-deployment-demo-worker",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws:iam::074388197187:role/aws-agent-deployment-demo-execution-role",
+  "taskRoleArn": "arn:aws:iam::074388197187:role/aws-agent-deployment-demo-worker-task-role",
+  "containerDefinitions": [
+    {
+      "name": "agent-demo-worker",
+      "image": "074388197187.dkr.ecr.us-east-1.amazonaws.com/aws-agent-deployment-demo:latest",
+      "essential": true,
+      "command": [
+        "celery",
+        "-A",
+        "app.celery_app.celery_app",
+        "worker",
+        "--loglevel=info"
+      ],
+      "environment": [
+        {
+          "name": "APP_ENV",
+          "value": "production"
+        },
+        {
+          "name": "SERVICE_NAME",
+          "value": "aws-agent-deployment-demo-worker"
+        },
+        {
+          "name": "OPENAI_MODEL",
+          "value": "gpt-4o-mini"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "REDIS_URL",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:074388197187:secret:aws-agent-deployment-demo/redis-url-WFzkKI"
+        },
+        {
+          "name": "OPENAI_API_KEY",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:074388197187:secret:aws-agent-deployment-demo/openai-api-key-T3L3Lq"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/aws-agent-deployment-demo/worker",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "worker"
+        }
+      }
+    }
+  ]
+}

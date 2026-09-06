@@ -1,0 +1,14 @@
+[
+    {
+        "name": "aws-agent-deployment-demo-api",
+        "desired": 4,
+        "running": 4,
+        "pending": 0
+    },
+    {
+        "name": "aws-agent-deployment-demo-worker",
+        "desired": 1,
+        "running": 1,
+        "pending": 0
+    }
+]

@@ -1,0 +1,5 @@
+Autoscaling live test summary (worker-first) — 2026-08-09T03:50:14Z
+Phase 1 — Worker scale-out (QueueDepth metric): PASS
+Phase 2 — API scale-out (load test):          PASS
+Worker phase cooldown: 120s
+Artifacts: /Users/nachiketh/Desktop/author-repo/cohort-5-may/aws-agent-deployment-demo/scripts/../proof/autoscaling-live-worker-first-20260809-090813

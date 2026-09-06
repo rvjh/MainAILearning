@@ -1,0 +1,213 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  ECS Application Auto Scaling for API (CPU + ALB requests) and worker (Celery QueueDepth).
+  Deploy after the main aws-agent-deployment-demo stack and ECS services exist.
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: aws-agent-deployment-demo
+  ClusterName:
+    Type: String
+  ApiServiceName:
+    Type: String
+  WorkerServiceName:
+    Type: String
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+  SubnetIds:
+    Type: CommaDelimitedList
+  EcsSecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
+  RedisSecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
+  RedisUrl:
+    Type: String
+    NoEcho: true
+  AlbRequestCountResourceLabel:
+    Type: String
+    Description: ALB resource label for ALBRequestCountPerTarget (app/.../targetgroup/...)
+  QueueDepthLambdaBucket:
+    Type: String
+  QueueDepthLambdaKey:
+    Type: String
+    Default: queue_depth_publisher.zip
+  ApiMinCapacity:
+    Type: Number
+    Default: 1
+  ApiMaxCapacity:
+    Type: Number
+    Default: 4
+  WorkerMinCapacity:
+    Type: Number
+    Default: 1
+  WorkerMaxCapacity:
+    Type: Number
+    Default: 4
+  QueueDepthTarget:
+    Type: Number
+    Default: 5
+    Description: Target average queue depth per worker task
+
+Resources:
+  QueueDepthLambdaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub "${ProjectName} queue depth Lambda"
+      VpcId: !Ref VpcId
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+
+  RedisIngressFromQueueDepthLambda:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref RedisSecurityGroupId
+      IpProtocol: tcp
+      FromPort: 6379
+      ToPort: 6379
+      SourceSecurityGroupId: !Ref QueueDepthLambdaSecurityGroup
+
+  QueueDepthLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${ProjectName}-queue-depth-lambda-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+      Policies:
+        - PolicyName: PublishQueueDepthMetric
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: cloudwatch:PutMetricData
+                Resource: "*"
+
+  QueueDepthPublisher:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub "${ProjectName}-queue-depth-publisher"
+      Runtime: python3.11
+      Handler: lambda_function.handler
+      Role: !GetAtt QueueDepthLambdaRole.Arn
+      Timeout: 30
+      MemorySize: 128
+      Code:
+        S3Bucket: !Ref QueueDepthLambdaBucket
+        S3Key: !Ref QueueDepthLambdaKey
+      Environment:
+        Variables:
+          REDIS_URL: !Ref RedisUrl
+          METRIC_NAMESPACE: !Sub "${ProjectName}/Celery"
+          CELERY_QUEUE_NAME: celery
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref QueueDepthLambdaSecurityGroup
+        SubnetIds: !Ref SubnetIds
+
+  QueueDepthScheduleRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Sub "${ProjectName}-queue-depth-schedule"
+      Description: Publish Celery queue depth to CloudWatch every minute
+      ScheduleExpression: rate(1 minute)
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt QueueDepthPublisher.Arn
+          Id: QueueDepthPublisherTarget
+
+  QueueDepthSchedulePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref QueueDepthPublisher
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt QueueDepthScheduleRule.Arn
+
+  ApiScalableTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MaxCapacity: !Ref ApiMaxCapacity
+      MinCapacity: !Ref ApiMinCapacity
+      ResourceId: !Sub "service/${ClusterName}/${ApiServiceName}"
+      RoleARN: !Sub "arn:aws:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService"
+      ScalableDimension: ecs:service:DesiredCount
+      ServiceNamespace: ecs
+
+  ApiCpuScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    DependsOn: ApiScalableTarget
+    Properties:
+      PolicyName: !Sub "${ProjectName}-api-cpu-target"
+      PolicyType: TargetTrackingScaling
+      ResourceId: !Sub "service/${ClusterName}/${ApiServiceName}"
+      ScalableDimension: ecs:service:DesiredCount
+      ServiceNamespace: ecs
+      TargetTrackingScalingPolicyConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ECSServiceAverageCPUUtilization
+        TargetValue: 40
+        ScaleInCooldown: 120
+        ScaleOutCooldown: 30
+
+  ApiAlbScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    DependsOn: ApiScalableTarget
+    Properties:
+      PolicyName: !Sub "${ProjectName}-api-alb-requests-target"
+      PolicyType: TargetTrackingScaling
+      ResourceId: !Sub "service/${ClusterName}/${ApiServiceName}"
+      ScalableDimension: ecs:service:DesiredCount
+      ServiceNamespace: ecs
+      TargetTrackingScalingPolicyConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ALBRequestCountPerTarget
+          ResourceLabel: !Ref AlbRequestCountResourceLabel
+        TargetValue: 30
+        ScaleInCooldown: 120
+        ScaleOutCooldown: 30
+
+  WorkerScalableTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MaxCapacity: !Ref WorkerMaxCapacity
+      MinCapacity: !Ref WorkerMinCapacity
+      ResourceId: !Sub "service/${ClusterName}/${WorkerServiceName}"
+      RoleARN: !Sub "arn:aws:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService"
+      ScalableDimension: ecs:service:DesiredCount
+      ServiceNamespace: ecs
+
+  WorkerQueueDepthScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    DependsOn: WorkerScalableTarget
+    Properties:
+      PolicyName: !Sub "${ProjectName}-worker-queue-depth-target"
+      PolicyType: TargetTrackingScaling
+      ResourceId: !Sub "service/${ClusterName}/${WorkerServiceName}"
+      ScalableDimension: ecs:service:DesiredCount
+      ServiceNamespace: ecs
+      TargetTrackingScalingPolicyConfiguration:
+        TargetValue: !Ref QueueDepthTarget
+        CustomizedMetricSpecification:
+          MetricName: QueueDepth
+          Namespace: !Sub "${ProjectName}/Celery"
+          Statistic: Average
+        ScaleInCooldown: 120
+        ScaleOutCooldown: 60
+
+Outputs:
+  ApiScalableTargetResourceId:
+    Value: !Sub "service/${ClusterName}/${ApiServiceName}"
+  WorkerScalableTargetResourceId:
+    Value: !Sub "service/${ClusterName}/${WorkerServiceName}"
+  QueueDepthMetricNamespace:
+    Value: !Sub "${ProjectName}/Celery"
+  QueueDepthLambdaArn:
+    Value: !GetAtt QueueDepthPublisher.Arn

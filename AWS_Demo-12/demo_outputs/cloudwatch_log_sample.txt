@@ -1,0 +1,9 @@
+2026-05-23T14:32:15.441Z [api] INFO:     10.0.1.42:52314 - "POST /jobs HTTP/1.1" 202 Accepted
+2026-05-23T14:32:15.892Z [api] INFO:     10.0.2.18:44102 - "GET /jobs/a1b2c3d4-e5f6-7890-abcd-ef1234567890 HTTP/1.1" 200 OK
+2026-05-23T14:32:16.104Z [worker] [INFO/MainProcess] Task run_agent_job[a1b2c3d4-e5f6-7890-abcd-ef1234567890] received
+2026-05-23T14:32:16.405Z [worker] [INFO/ForkPoolWorker-1] run_agent_job: step=planning progress=0
+2026-05-23T14:32:16.706Z [worker] [INFO/ForkPoolWorker-1] run_agent_job: step=retrieving_context progress=25
+2026-05-23T14:32:17.007Z [worker] [INFO/ForkPoolWorker-1] run_agent_job: step=generating_answer progress=50
+2026-05-23T14:32:17.308Z [worker] [INFO/ForkPoolWorker-1] run_agent_job: step=validating_output progress=75
+2026-05-23T14:32:17.609Z [worker] [INFO/ForkPoolWorker-1] Task run_agent_job[a1b2c3d4-e5f6-7890-abcd-ef1234567890] succeeded in 1.505s
+2026-05-23T14:32:17.812Z [api] INFO:     10.0.1.42:52320 - "GET /jobs/a1b2c3d4-e5f6-7890-abcd-ef1234567890 HTTP/1.1" 200 OK

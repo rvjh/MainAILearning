@@ -1,0 +1,64 @@
+{
+  "family": "aws-agent-deployment-demo-api",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "arn:aws:iam::074388197187:role/aws-agent-deployment-demo-execution-role",
+  "taskRoleArn": "arn:aws:iam::074388197187:role/aws-agent-deployment-demo-api-task-role",
+  "containerDefinitions": [
+    {
+      "name": "agent-demo-api",
+      "image": "074388197187.dkr.ecr.us-east-1.amazonaws.com/aws-agent-deployment-demo:latest",
+      "essential": true,
+      "command": [
+        "uvicorn",
+        "app.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000"
+      ],
+      "portMappings": [
+        {
+          "containerPort": 8000,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "APP_ENV",
+          "value": "production"
+        },
+        {
+          "name": "SERVICE_NAME",
+          "value": "aws-agent-deployment-demo-api"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "REDIS_URL",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:074388197187:secret:aws-agent-deployment-demo/redis-url-WFzkKI"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/aws-agent-deployment-demo/api",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "api"
+        }
+      },
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\""
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 10
+      }
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "status": "ok",
+  "service": "aws-agent-deployment-demo",
+  "env": "local"
+}

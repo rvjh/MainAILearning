@@ -1,0 +1,9 @@
+.gitignore
+.env
+.env.aws
+.venv/
+__pycache__/
+.pytest_cache/
+data/audit_events.jsonl
+aws/rendered/*.json
+aws/rendered/deploy.env

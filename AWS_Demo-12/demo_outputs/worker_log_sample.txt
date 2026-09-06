@@ -1,0 +1,8 @@
+[2026-05-23 14:32:01,204: INFO/MainProcess] Connected to redis://redis:6379/0
+[2026-05-23 14:32:01,208: INFO/MainProcess] celery@worker ready.
+[2026-05-23 14:32:15,441: INFO/MainProcess] Task run_agent_job[a1b2c3d4-e5f6-7890-abcd-ef1234567890] received
+[2026-05-23 14:32:15,742: INFO/ForkPoolWorker-1] run_agent_job[a1b2c3d4-e5f6-7890-abcd-ef1234567890]: step=planning progress=0
+[2026-05-23 14:32:16,043: INFO/ForkPoolWorker-1] run_agent_job[a1b2c3d4-e5f6-7890-abcd-ef1234567890]: step=retrieving_context progress=25
+[2026-05-23 14:32:16,344: INFO/ForkPoolWorker-1] run_agent_job[a1b2c3d4-e5f6-7890-abcd-ef1234567890]: step=generating_answer progress=50
+[2026-05-23 14:32:16,645: INFO/ForkPoolWorker-1] run_agent_job[a1b2c3d4-e5f6-7890-abcd-ef1234567890]: step=validating_output progress=75
+[2026-05-23 14:32:16,946: INFO/ForkPoolWorker-1] Task run_agent_job[a1b2c3d4-e5f6-7890-abcd-ef1234567890] succeeded in 1.505s

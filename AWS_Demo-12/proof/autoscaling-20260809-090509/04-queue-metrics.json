@@ -1,0 +1,6 @@
+## Live queue depth (API)
+{
+    "queue_depth": 0,
+    "namespace": "aws-agent-deployment-demo/Celery",
+    "metric_name": "QueueDepth"
+}

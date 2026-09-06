@@ -1,0 +1,10 @@
+## Rate limit config
+{
+    "rate_limit": {
+        "enabled": true,
+        "requests_per_minute": 120,
+        "window_seconds": 60
+    },
+    "openai_model": "gpt-4o-mini",
+    "notes": "OpenAI usage is billed per token on the worker path only."
+}

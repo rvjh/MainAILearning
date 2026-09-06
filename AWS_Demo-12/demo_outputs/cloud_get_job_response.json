@@ -1,0 +1,18 @@
+{
+  "job_id": "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
+  "status": "completed",
+  "progress": null,
+  "result": {
+    "query": "What is the deployment architecture?",
+    "answer": "The deployment uses a FastAPI API on ECS Fargate behind an ALB, a Celery worker on ECS Fargate, Redis on ElastiCache, and secrets from AWS Secrets Manager. The API enqueues jobs; the worker calls OpenAI.",
+    "steps_completed": [
+      "planning",
+      "retrieving_context",
+      "generating_answer",
+      "validating_output",
+      "completed"
+    ],
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  }
+}

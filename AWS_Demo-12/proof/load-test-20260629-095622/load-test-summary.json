@@ -1,0 +1,21 @@
+{
+  "url": "http://aws-agent-deployment-demo-alb-1720809015.us-east-1.elb.amazonaws.com",
+  "concurrency": 10,
+  "duration_s": 3.52,
+  "health": {
+    "count": 30,
+    "statuses": {
+      "200": 30
+    },
+    "p50_s": 0.4294,
+    "p95_s": 0.438
+  },
+  "jobs": {
+    "count": 10,
+    "statuses": {
+      "202": 10
+    },
+    "p50_s": 0.438,
+    "p95_s": 0.4502
+  }
+}
