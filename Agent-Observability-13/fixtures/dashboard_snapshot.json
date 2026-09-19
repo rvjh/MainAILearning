@@ -1,0 +1,32 @@
+{
+  "theme": "The agent is running—but is it working?",
+  "agent": "support-ops (LangGraph + LangChain tools)",
+  "dimensions": ["reliability", "performance", "quality", "efficiency", "safety"],
+  "example_panels": {
+    "are_users_affected": {
+      "jobs_completed": 42,
+      "jobs_failed": 1,
+      "jobs_overdue": 1,
+      "validated_success_rate": 0.86
+    },
+    "where_is_delay": {
+      "e2e_p50_ms": 420,
+      "e2e_p95_ms": 1800,
+      "queue_wait_p95_ms": 90,
+      "execution_p95_ms": 1600,
+      "top_slow_span": "gen_ai.tool.call:lookup_order"
+    },
+    "which_version": {
+      "support-ops-v1_validated_success": 30,
+      "support-ops-v2_validated_success": 6,
+      "support-ops-v2_validated_failure": 5
+    }
+  },
+  "classroom_slo": ">=99% eligible accepted jobs produce validated result within 60s",
+  "stack": {
+    "framework": ["langchain", "langgraph"],
+    "model": "openai (optional)",
+    "traces_ui": "LangSmith (optional) + local logs/traces.jsonl",
+    "ops_metrics": "in-process dashboard JSON (+ CloudWatch in aws-agent-deployment-demo)"
+  }
+}
