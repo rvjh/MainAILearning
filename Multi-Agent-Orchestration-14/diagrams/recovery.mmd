@@ -1,0 +1,21 @@
+sequenceDiagram
+  participant T as Specialist team
+  participant DB as Workflow database
+  participant H as Human
+  participant W as Worker
+  participant P as Provider
+  T->>DB: Freeze evidence and submit exact proposal
+  Note over DB,H: Manager deadline passes while scheduler is stopped
+  H->>DB: Late manager approval
+  DB-->>H: Reject expired authority
+  Note over DB: Scheduler resumes, supersedes manager, creates director task
+  H->>DB: Director approves current proposal
+  Note over DB,W: Decision and resume event persist while worker is down
+  W->>DB: Resume, accept event, claim execution intent
+  W->>P: Refund with stable operation key
+  P->>P: Commit one ledger entry
+  P--xW: Response lost
+  W->>DB: Record unknown outcome
+  W->>P: Query original operation key
+  P-->>W: Existing receipt
+  W->>DB: Reconcile and complete with receipt

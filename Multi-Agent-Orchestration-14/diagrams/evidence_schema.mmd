@@ -1,0 +1,79 @@
+---
+title: Selected fields and relationships; complete DDL in lab/sql
+---
+erDiagram
+  agent_cases ||--o{ agent_tasks : assigns
+  agent_tasks ||--o| agent_results : records
+  agent_cases ||--o{ coordination_decisions : explains
+  agent_cases ||--o| workflow_instances : submits
+  workflow_instances ||--o{ approval_tasks : awaits
+  approval_tasks ||--o| approval_decisions : accepts
+  workflow_instances ||--o{ execution_attempts : executes
+  agent_cases {
+    uuid tenant_id PK
+    uuid id PK
+    uuid order_id FK
+    bigint amount_minor
+    int proposal_version
+    text status
+    jsonb facts
+    jsonb snapshot
+    uuid workflow_id FK
+  }
+  agent_tasks {
+    uuid tenant_id PK
+    uuid id PK
+    uuid case_id FK
+    text specialist
+    int round_no
+    text status
+    timestamptz due_at
+  }
+  agent_results {
+    uuid tenant_id PK,FK
+    uuid task_id PK,FK
+    jsonb result
+    text backend
+    text model_version
+    text prompt_version
+  }
+  coordination_decisions {
+    uuid tenant_id PK
+    uuid id PK
+    uuid case_id FK
+    int round_no
+    text action
+    text target
+    text reason
+    jsonb input_snapshot
+  }
+  workflow_instances {
+    uuid tenant_id PK
+    uuid id PK
+    jsonb proposal
+    int proposal_version
+    text state
+  }
+  approval_tasks {
+    uuid tenant_id PK,FK
+    uuid id PK
+    uuid workflow_id FK
+    text required_role
+    timestamptz due_at
+    text status
+  }
+  approval_decisions {
+    uuid tenant_id PK,FK
+    uuid id PK
+    uuid task_id FK
+    uuid actor_id FK
+    text reason
+  }
+  execution_attempts {
+    uuid tenant_id PK,FK
+    uuid id PK
+    uuid workflow_id FK
+    text operation_key
+    text provider_receipt_id
+    text status
+  }

@@ -1,0 +1,79 @@
+name: july-sunday-learner
+x-app: &app
+  build: .
+  env_file:
+    - path: .env
+      required: false
+  environment: &env
+    DATABASE_URL: postgresql://lab_app:classroom@db:5432/enterprise
+    CELERY_BROKER_URL: redis://redis:6379/0
+    CELERY_RESULT_BACKEND: redis://redis:6379/1
+    ERP_URL: http://erp:8001
+    ERP_TOKEN: lab-erp-secret
+    APPROVAL_SECONDS: '180'
+    LEASE_SECONDS: '8'
+    ENABLE_LAB_FAULTS: '1'
+    REQUIRE_TEAM_CASE: '1'
+    TEAM_EXERCISES: starter
+    OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    OPENAI_MODEL: ${OPENAI_MODEL:-gpt-5.4-mini}
+    OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://api.openai.com/v1}
+    LANGSMITH_API_KEY: ${LANGSMITH_API_KEY:-}
+    LANGSMITH_TRACING: ${LANGSMITH_TRACING:-}
+    LANGSMITH_PROJECT: ${LANGSMITH_PROJECT:-july-cohort-observability}
+    LANGCHAIN_TRACING_V2: ${LANGSMITH_TRACING:-}
+    LANGCHAIN_API_KEY: ${LANGSMITH_API_KEY:-}
+    LANGCHAIN_PROJECT: ${LANGSMITH_PROJECT:-july-cohort-observability}
+  volumes:
+    - ./app:/lab/app:ro
+    - ./tests:/lab/tests:ro
+  depends_on:
+    db: {condition: service_healthy}
+    redis: {condition: service_healthy}
+services:
+  db:
+    image: postgres:16-alpine@sha256:16bc17c64a573ef34162af9298258d1aec548232985b33ed7b1eac33ba35c229
+    environment:
+      POSTGRES_USER: lab_admin
+      POSTGRES_PASSWORD: classroom-admin
+      POSTGRES_DB: enterprise
+    ports: ['127.0.0.1:5568:5432']
+    volumes:
+      - learner_postgres_data:/var/lib/postgresql/data
+      - ./sql:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U lab_admin -d enterprise']
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  redis:
+    image: redis:7.4.2-alpine
+    ports: ['127.0.0.1:6398:6379']
+    volumes: [learner_redis_data:/data]
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 2s
+      timeout: 3s
+      retries: 20
+  api:
+    <<: *app
+    ports: ['127.0.0.1:8098:8000']
+  publisher:
+    <<: *app
+    command: ['python', '-m', 'app.runtime', 'publisher']
+  worker:
+    <<: *app
+    command: ['python', '-m', 'app.runtime', 'worker']
+  scheduler:
+    <<: *app
+    command: ['python', '-m', 'app.runtime', 'scheduler']
+  erp:
+    build: .
+    command: ['uvicorn', 'app.erp:app', '--host', '0.0.0.0', '--port', '8001']
+    environment: {ERP_TOKEN: lab-erp-secret, ERP_DB: /data/refunds.db, ENABLE_LAB_FAULTS: '1'}
+    ports: ['127.0.0.1:8099:8001']
+    volumes: [learner_erp_data:/data, './app:/lab/app:ro']
+volumes:
+  learner_postgres_data:
+  learner_redis_data:
+  learner_erp_data:

@@ -1,0 +1,27 @@
+flowchart TB
+  C["Coordinator: persisted case, two-round budget"]
+  P["Policy specialist: scoped policy facts"]
+  O["Order specialist: scoped order facts"]
+  R["Risk specialist: scoped risk facts"]
+  G["Validated results and deterministic supervisor"]
+  B["BLOCKED: missing or conflicting evidence"]
+  S["READY: frozen proposal snapshot"]
+  H["Human approval: current role, version, deadline"]
+  E["Controlled executor: stable operation key"]
+  L["Independent provider ledger"]
+  D[("PostgreSQL: cases, tasks, results, decisions, workflow")]
+  C --> P
+  C --> O
+  C --> R
+  P --> G
+  O --> G
+  R --> G
+  G -->|"risk only, once"| R
+  G --> B
+  G --> S
+  S --> H
+  H -->|"authorized intent via outbox, Celery, inbox"| E
+  E --> L
+  C -.-> D
+  G -.-> D
+  H -.-> D

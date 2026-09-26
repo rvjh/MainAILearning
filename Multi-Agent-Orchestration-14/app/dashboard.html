@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ACME approvals</title>
+<style>
+:root {
+  font-family: system-ui, sans-serif;
+  color: #182c3c;
+  background: #f3f6f8;
+}
+body { max-width: 1400px; margin: 0 auto; padding: 20px 28px 28px; }
+h1 { font-size: 26px; margin: 0 0 12px; }
+h2 { font-size: 18px; margin: 0 0 10px; }
+header { border-bottom: 1px solid #c5d2d8; padding-bottom: 16px; }
+button, select, input, textarea {
+  font: inherit;
+  padding: 8px 9px;
+  border: 1px solid #b8c7ce;
+  border-radius: 3px;
+}
+button { background: #175f5b; color: #fff; cursor: pointer; }
+button.secondary { background: #fff; color: #175f5b; }
+button:disabled { opacity: .5; }
+label { display: inline-block; margin: 6px 12px 6px 0; font-size: 14px; }
+label input, label select { display: block; margin-top: 4px; }
+main { display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; }
+.panel { background: #fff; border: 1px solid #d9e1e6; padding: 16px 18px; margin-top: 16px; }
+.muted { color: #58707c; font-size: 14px; }
+.state { font-family: ui-monospace, Menlo, monospace; color: #175f5b; font-weight: 700; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 8px 5px; border-bottom: 1px solid #e4e9ec; }
+td button { font-size: 13px; }
+pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: #edf2f5;
+  padding: 12px;
+  font-size: 12px;
+}
+.event { border-left: 3px solid #73a6a2; padding: 2px 12px; margin: 12px 0; }
+.event p { margin: 4px 0; }
+#notice { min-height: 22px; margin-top: 10px; color: #9c321b; }
+textarea { display: block; width: 100%; box-sizing: border-box; margin: 10px 0; }
+footer { margin: 20px 0 0; color: #58707c; font-size: 13px; }
+#workflows { max-height: 420px; overflow: auto; }
+#tasks { max-height: 260px; overflow: auto; }
+@media (max-width: 900px) { main { display: block; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>ACME approval operations</h1>
+  <label>Classroom persona
+    <select id="persona">
+      <option value="requester">Support requester</option>
+      <option value="support_lead">Support lead</option>
+      <option value="finance_manager">Finance manager</option>
+      <option value="finance_director">Finance director</option>
+      <option value="operator">Operations</option>
+    </select>
+  </label>
+  <label>Tenant
+    <select id="tenant">
+      <option>acme</option>
+      <option>globex</option>
+    </select>
+  </label>
+  <button id="refresh">Refresh</button>
+  <span id="identity" class="muted"></span>
+  <div id="notice" role="status"></div>
+</header>
+<main>
+  <section>
+    <div class="panel">
+      <h2>Specialist investigation first</h2>
+      <p class="muted">Create the case with app.team. Submit it only when READY. Then pick the workflow below and read the proposal snapshot before approving.</p>
+      <div hidden>
+        <label>Amount in INR <input id="amount" type="number" min="1" value="18000"></label>
+        <label>Approval deadline, seconds <input id="deadline" type="number" min="2" max="3600" value="180"></label>
+        <label>Scenario
+          <select id="fault">
+            <option value="none">Healthy execution</option>
+            <option value="lost_response">Refund commits, response is lost</option>
+            <option value="crash_after_refund">Worker crashes after refund</option>
+            <option value="transient_once">One transient provider failure</option>
+            <option value="permanent">Permanent provider rejection</option>
+            <option value="unknown_status">Refund and status both uncertain</option>
+          </select>
+        </label>
+        <p><button id="submit">Submit proposal</button></p>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Workflows</h2>
+      <div id="workflows"></div>
+    </div>
+    <div class="panel">
+      <h2>Your approval inbox</h2>
+      <div id="tasks"></div>
+    </div>
+    <div class="panel">
+      <h2>Operations signals</h2>
+      <pre id="metrics">Choose Operations to inspect queue and exception ages.</pre>
+    </div>
+  </section>
+  <section>
+    <div class="panel">
+      <h2>Workflow evidence</h2>
+      <div id="detail">
+        <p class="muted">Select a workflow. The same ID ties together proposal, approval, attempts, and audit events.</p>
+      </div>
+    </div>
+  </section>
+</main>
+<footer>Local simulation. Persona tokens are classroom credentials. Auto-refresh every 3s.</footer>
+<script>
+let selected = null;
+let activeTask = null;
+
+function $(id) { return document.getElementById(id); }
+
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+
+function token() {
+  return $('tenant').value + '-' + $('persona').value + '-token';
+}
+
+async function api(path, body) {
+  const r = await fetch(path, {
+    method: body ? 'POST' : 'GET',
+    headers: { Authorization: 'Bearer ' + token(), 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  const j = await r.json();
+  if (!r.ok) throw Error(r.status + ': ' + (j.detail || JSON.stringify(j)));
+  return j;
+}
+
+function notify(s) { $('notice').textContent = s; }
+
+function bindPickers(root) {
+  root.querySelectorAll('button[data-id]').forEach(b => {
+    b.onclick = () => { selected = b.dataset.id; show(); };
+  });
+}
+
+async function refresh() {
+  try {
+    const [me, ws, ts] = await Promise.all([api('/me'), api('/workflows'), api('/tasks')]);
+    $('identity').textContent = ' ' + me.subject;
+    $('workflows').innerHTML = '<table><tr><th>ID</th><th>Amount</th><th>State</th></tr>' +
+      ws.map(w => '<tr><td><button class="secondary" data-id="' + w.id + '">' + w.id.slice(0, 8) +
+        '</button></td><td>INR ' + (w.amount_minor / 100) + '</td><td class="state">' + esc(w.state) +
+        '</td></tr>').join('') + '</table>';
+    bindPickers($('workflows'));
+    $('tasks').innerHTML = ts.length
+      ? ts.map(t => '<p><button class="secondary" data-id="' + t.workflow_id + '">Review ' +
+          t.workflow_id.slice(0, 8) + '</button> Stage ' + t.stage + ' · due ' +
+          new Date(t.due_at).toLocaleTimeString() + '</p>').join('')
+      : '<p class="muted">No pending task for this role.</p>';
+    bindPickers($('tasks'));
+    if ($('persona').value === 'operator') {
+      $('metrics').textContent = JSON.stringify(await api('/metrics'), null, 2);
+    }
+    // don't clobber a reason the operator is still typing
+    if (selected && !document.activeElement?.matches('textarea')) await show();
+  } catch (e) {
+    notify(e.message);
+  }
+}
+
+async function show() {
+  try {
+    const d = await api('/workflows/' + selected);
+    const w = d.workflow;
+    activeTask = d.approval_tasks.find(t => t.status === 'PENDING');
+    const oldReason = $('reason')?.value || '';
+    let html = '<p class="state">' + esc(w.state) + ' · version ' + w.version + '</p>' +
+      '<p>' + esc(w.id) + '</p>' +
+      '<p>INR ' + (w.amount_minor / 100) + ' · proposal ' + w.proposal_version + ' · ' + esc(w.policy_version) + '</p>' +
+      '<p>' + esc(w.proposal.summary) + '</p>' +
+      '<details><summary>Proposal and policy snapshot</summary><pre>' +
+      esc(JSON.stringify({ proposal: w.proposal, policy: w.policy_snapshot }, null, 2)) +
+      '</pre></details>';
+    if (activeTask) {
+      html += '<h2>Pending decision</h2><p>Stage ' + activeTask.stage + ' · ' +
+        esc(activeTask.required_role) + ' · due ' + new Date(activeTask.due_at).toLocaleString() +
+        '</p><textarea id="reason" placeholder="Reason for this decision">' + esc(oldReason) +
+        '</textarea><button id="approve">Approve exact proposal</button> ' +
+        '<button id="reject" class="secondary">Reject</button>';
+    }
+    if ($('persona').value === 'operator') {
+      html += '<h2>Operator actions</h2><textarea id="opreason" placeholder="Evidence and reason"></textarea>' +
+        '<button id="reconcile">Reconcile provider receipt</button> ' +
+        '<button id="close" class="secondary">Close unexecuted review</button> ' +
+        '<button id="redeliver" class="secondary">Redeliver approval event</button>';
+    }
+    html += '<h2>Execution attempts</h2><pre>' + esc(JSON.stringify(d.execution_attempts, null, 2)) +
+      '</pre><h2>Audit timeline</h2>';
+    html += d.audit_events.map(a =>
+      '<div class="event"><p><strong>' + a.sequence_no + '. ' + esc(a.event_type) + '</strong></p>' +
+      '<p class="muted">' + new Date(a.occurred_at).toLocaleTimeString() + ' · ' +
+      esc(a.actor_role_snapshot || a.actor_kind) + '</p><p>' + esc(a.reason || '') + '</p>' +
+      '<pre>' + esc(JSON.stringify(a.details)) + '</pre></div>'
+    ).join('');
+    html += '<button id="export" class="secondary">Download evidence JSON</button>';
+    $('detail').innerHTML = html;
+
+    for (const decision of ['approve', 'reject']) {
+      if ($(decision)) {
+        $(decision).onclick = async () => {
+          try {
+            await api('/tasks/' + activeTask.id + '/decision', {
+              decision,
+              reason: $('reason').value,
+              proposal_version: w.proposal_version,
+              task_version: activeTask.version,
+              command_key: crypto.randomUUID()
+            });
+            notify('Decision recorded');
+            await refresh();
+          } catch (e) { notify(e.message); }
+        };
+      }
+    }
+    for (const action of ['reconcile', 'close']) {
+      if ($(action)) {
+        $(action).onclick = async () => {
+          try {
+            await api('/workflows/' + selected + '/operate', { action, reason: $('opreason').value });
+            await refresh();
+          } catch (e) { notify(e.message); }
+        };
+      }
+    }
+    if ($('redeliver')) {
+      $('redeliver').onclick = async () => {
+        await api('/lab/redeliver/' + selected, {});
+        notify('Original event scheduled for redelivery');
+        await refresh();
+      };
+    }
+    $('export').onclick = () => {
+      const url = URL.createObjectURL(new Blob([JSON.stringify(d, null, 2)], { type: 'application/json' }));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'audit-' + selected + '.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    };
+  } catch (e) {
+    notify(e.message);
+  }
+}
+
+$('submit').onclick = async () => {
+  try {
+    const amount = Math.round(Number($('amount').value) * 100);
+    const o = await api('/lab/orders', { amount_minor: Math.max(amount, 5000000) });
+    const w = await api('/workflows', {
+      order_id: o.id,
+      amount_minor: amount,
+      idempotency_key: crypto.randomUUID(),
+      fault: $('fault').value,
+      approval_seconds: Number($('deadline').value)
+    });
+    selected = w.id;
+    notify('202 Accepted. Workflow ' + w.id);
+    await refresh();
+  } catch (e) {
+    notify(e.message);
+  }
+};
+
+$('refresh').onclick = refresh;
+$('persona').onchange = refresh;
+$('tenant').onchange = () => { selected = null; refresh(); };
+refresh();
+setInterval(refresh, 3000);
+</script>
+</body>
+</html>
